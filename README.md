@@ -168,10 +168,13 @@ Use the provided `scripts\run_annotation_windows.bat` to launch three Command Pr
 
    - `ANNOTATION_INPUT_DIR` – default images directory if you don’t pass one.
    - `SERVE_PORT` – HTTP port for the local file server (defaults to 8081).
+   - `SERVE_HOST` – Host/IP bound by the local file server (defaults to `0.0.0.0`).
+   - `PYTHON_BIN` – Specific Python interpreter/conda shim to use (defaults to `python`).
+   - `LABELSTUDIO_CMD` – Command used to start Label Studio (defaults to `label-studio start`; useful for `conda run -n handwritten-ocr label-studio start`).
 
 3. Three windows appear titled “Label Studio”, “Label Studio Files”, and “Paddle Annotation”. Close each when finished.
 
-If you need to customize commands further, edit the batch file (for example, replace `label-studio start` with `conda run -n handwritten-ocr label-studio start`).
+You can still tweak the batch file if you want different behavior, but most tweaks (changing Python or the Label Studio command) are easier via the environment variables above.
 
 ### Option C: Pure PowerShell / Command Prompt
 
