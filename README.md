@@ -6,6 +6,7 @@ This repository contains a lightweight pipeline for running PaddleOCR text detec
 
 - `scripts/run_paddle_annotation.py` – Python CLI that iterates over images, runs PaddleOCR `TextDetection`, normalizes polygons, and writes `output/ls_preannotations.json` in the format Label Studio expects.
 - `scripts/run_annotation.sh` – Bash wrapper that can orchestrate the whole workflow: start Label Studio, launch the local file server, and kick off the Python CLI (with optional support for opening each process in its own terminal window).
+- `scripts/run_annotation_windows.bat` – Windows batch helper that opens three Command Prompt windows to run Label Studio, the local file server, and the PaddleOCR CLI without needing Bash.
 - `serve_local_files.py` – Simple HTTP server with permissive CORS headers so Label Studio can access local files through the `http` storage type.
 - `data/` – Place raw images under `data/raw/` (or point the scripts at another directory via flags) plus any train/valid/test splits you maintain.
 - `notebooks/testingPaddle.ipynb` – Original exploratory notebook demonstrating the detection logic that the scripts now automate.
@@ -147,36 +148,38 @@ You can operate entirely from Anaconda Prompt / PowerShell with Conda; the only 
 
 5. Label Studio opens in your browser, the file server serves `data/raw`, and the Python CLI generates predictions.
 
-### Option B: Pure PowerShell / Command Prompt
+### Option B: Windows batch helper
 
-If you can’t run Bash, call the Python components directly:
+Use the provided `scripts\run_annotation_windows.bat` to launch three Command Prompt windows (Label Studio, local file server, PaddleOCR CLI) from an activated Anaconda Prompt:
 
-1. Open **Anaconda Prompt** (or PowerShell) and activate your env:
+1. Open **Anaconda Prompt** and activate your environment:
 
-   ```powershell
+   ```cmd
    conda activate handwritten-ocr
    ```
 
-2. Start Label Studio manually:
+2. Run the batch file (the optional first argument overrides the default `data\raw` image directory; anything after that is passed to the Python CLI, e.g., `--recursive`):
 
-   ```powershell
-   label-studio start
+   ```cmd
+   scripts\run_annotation_windows.bat data\raw --recursive
    ```
 
-   Leave this window open (or start it in a new terminal).
+   Environment variables you can set before running:
 
-3. In another terminal, launch the local file server:
+   - `ANNOTATION_INPUT_DIR` – default images directory if you don’t pass one.
+   - `SERVE_PORT` – HTTP port for the local file server (defaults to 8081).
 
-   ```powershell
-   python serve_local_files.py --directory data\raw --port 8081
-   ```
+3. Three windows appear titled “Label Studio”, “Label Studio Files”, and “Paddle Annotation”. Close each when finished.
 
-4. Finally, run the PaddleOCR CLI:
+If you need to customize commands further, edit the batch file (for example, replace `label-studio start` with `conda run -n handwritten-ocr label-studio start`).
 
-   ```powershell
-   python scripts\run_paddle_annotation.py data\raw --recursive --output-json output\ls_preannotations.json
-   ```
+### Option C: Pure PowerShell / Command Prompt
 
-5. Import `output\ls_preannotations.json` into Label Studio when ready.
+If you can’t run Bash or prefer manual control:
 
-You can combine these steps into a PowerShell script if you prefer automation on Windows without Bash. The key is ensuring each command runs inside the same Conda environment so PaddleOCR and Label Studio are available.*** End Patch
+1. Open **Anaconda Prompt** (or PowerShell) and activate your env.
+2. Start Label Studio: `label-studio start`.
+3. Start the local file server: `python serve_local_files.py --directory data\raw --port 8081`.
+4. Run the PaddleOCR CLI: `python scripts\run_paddle_annotation.py data\raw --recursive --output-json output\ls_preannotations.json`.
+
+Keep each command in its own window or background job as needed, ensuring they all run inside the same Conda environment.
