@@ -106,3 +106,23 @@ If your images live on Google Drive, rclone is a convenient way to mirror them l
    ```bash
    rclone copy output/ drive:path/to/outputs
    ```
+
+## Running on Windows (Conda/Anaconda prompt)
+
+The scripts work the same on Windows as long as they are executed from an Anaconda Prompt or PowerShell session where your Conda environment is active:
+
+1. Open “Anaconda Prompt” (or a Conda-enabled PowerShell).
+2. `conda activate handwritten-ocr` (or the env you created).
+3. Use the scripts exactly as shown above, e.g.:
+
+   ```bash
+   bash scripts/run_annotation.sh --serve-dir data/raw --recursive
+   ```
+
+   If you installed Git for Windows, you already have `bash`; otherwise launch “Git Bash” or enable the Windows Subsystem for Linux (WSL) to run the shell scripts.
+
+4. The Label Studio UI opens in your browser just like on Linux/macOS. If you prefer not to run bash, you can call the Python entrypoint directly:
+
+   ```powershell
+   python scripts\run_paddle_annotation.py data\raw --recursive
+   ```
