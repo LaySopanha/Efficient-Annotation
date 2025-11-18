@@ -21,7 +21,17 @@ Example Conda setup (see the [official PaddleOCR installation guide](https://www
 ```bash
 conda create -n handwritten-ocr python=3.10
 conda activate handwritten-ocr
-pip install paddleocr pillow label-studio
+
+# Install PaddlePaddle (pick the variant matching your hardware/driver)
+python -m pip install paddlepaddle==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cpu/             # CPU only
+# python -m pip install paddlepaddle-gpu==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/     # GPU, CUDA 11.8+, driver >=450.80.02 (Linux) / >=452.39 (Windows)
+# python -m pip install paddlepaddle-gpu==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu126/     # GPU, CUDA 12.6+, driver >=550.54.14
+
+# Install PaddleOCR
+python -m pip install paddleocr                 # basic OCR features
+# python -m pip install "paddleocr[all]"        # full feature set (document parsing, translation, KIE, etc.)
+
+pip install pillow label-studio
 ```
 
 ## Usage
