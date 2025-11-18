@@ -55,6 +55,7 @@ Optional flags:
 
 - `--terminals` – open Label Studio, the file server, and the annotator in three terminal windows (use `--terminal-cmd` to choose another emulator).
 - `--no-labelstudio` / `--no-serve` – skip launching those services if you already have them running.
+- `--no-annotator` – keep Label Studio/local server running but skip `run_paddle_annotation.py` (useful after detections are already saved).
 - `--serve-dir DIR` – change which directory is exposed and used as `LABEL_STUDIO_ROOT`.
 - `--labelstudio-cmd CMD` – customize how Label Studio is launched (handy if you need `conda run -n env label-studio start`).
 
@@ -171,6 +172,24 @@ Use the provided `scripts\run_annotation_windows.bat` to launch three Command Pr
    - `SERVE_HOST` – Host/IP bound by the local file server (defaults to `0.0.0.0`).
    - `PYTHON_BIN` – Specific Python interpreter/conda shim to use (defaults to `python`).
    - `LABELSTUDIO_CMD` – Command used to start Label Studio (defaults to `label-studio start`; useful for `conda run -n handwritten-ocr label-studio start`).
+   - `RUN_LABELSTUDIO`, `RUN_SERVER`, `RUN_ANNOTATOR` – set any of these to `0` to skip launching that component by default.
+
+   Wrapper-only flags (place them before the image directory) let you skip pieces on demand:
+
+   - `--no-labelstudio` – don’t open Label Studio.
+   - `--no-serve` – don’t start the local file server.
+   - `--no-annotator` – don’t run the PaddleOCR CLI (handy after detections are already saved).
+   - `--help` – show the usage message. Use `--` to mark the end of wrapper flags when you need to forward a literal `--something` to the Python script.
+
+   Examples:
+
+   ```cmd
+   :: Only re-launch Label Studio + file server, skip the detector
+   scripts\run_annotation_windows.bat --no-annotator data\raw
+
+   :: Pass extra PaddleOCR args after --
+   scripts\run_annotation_windows.bat --no-labelstudio data\raw -- --recursive --batch-size 2
+   ```
 
 3. Three windows appear titled “Label Studio”, “Label Studio Files”, and “Paddle Annotation”. Close each when finished.
 

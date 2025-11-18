@@ -16,6 +16,7 @@ LABELSTUDIO_CMD_DEFAULT="label-studio start"
 LABELSTUDIO_CMD="${LABELSTUDIO_CMD:-$LABELSTUDIO_CMD_DEFAULT}"
 USE_TERMINALS="${USE_TERMINALS:-0}"
 TERMINAL_CMD="${TERMINAL_CMD:-gnome-terminal}"
+RUN_ANNOTATOR="${RUN_ANNOTATOR:-1}"
 
 POSITIONAL_ARGS=()
 while [[ $# -gt 0 ]]; do
@@ -26,6 +27,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-labelstudio)
             LABELSTUDIO=0
+            shift
+            ;;
+        --no-annotator)
+            RUN_ANNOTATOR=0
             shift
             ;;
         --terminals)
@@ -53,6 +58,7 @@ while [[ $# -gt 0 ]]; do
 Wrapper options (must appear before PaddleOCR arguments):
   --no-serve             Do not launch serve_local_files.py
   --no-labelstudio       Do not launch Label Studio (assumes it's already running)
+  --no-annotator         Do not run scripts/run_paddle_annotation.py
   --terminals            Open each process (Label Studio, server, annotator) in separate terminals
   --serve-host HOST      Host/IP for serve_local_files.py (default: 0.0.0.0)
   --serve-port PORT      Port for serve_local_files.py and LABEL_STUDIO_PREFIX (default: 8081)
@@ -182,6 +188,19 @@ if [[ "$SERVE" -eq 1 ]]; then
         server_pid=$!
         sleep 1
     fi
+fi
+
+if [[ "$RUN_ANNOTATOR" -eq 0 ]]; then
+    echo "[INFO] Skipping PaddleOCR annotator (--no-annotator)."
+    if [[ "${USE_TERMINALS}" -eq 1 ]]; then
+        echo "[OK] Requested processes started in separate terminals. Close each window to stop its process."
+        exit 0
+    fi
+    if [[ -n "$server_pid" ]] || [[ -n "$labelstudio_pid" ]]; then
+        echo "[INFO] Background services are running. Press Ctrl+C to stop them."
+        wait
+    fi
+    exit 0
 fi
 
 if [[ "${USE_TERMINALS}" -eq 1 ]]; then
