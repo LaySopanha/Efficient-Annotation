@@ -16,7 +16,7 @@ This repository contains a lightweight pipeline for running PaddleOCR text detec
 - Packages: `paddleocr`, `pillow`, `label-studio` (and their transitive dependencies).
 - Optional: a terminal emulator such as `gnome-terminal` if you want the wrapper to spawn separate windows.
 
-Example Conda setup:
+Example Conda setup (see the [official PaddleOCR installation guide](https://www.paddleocr.ai/latest/en/version3.x/installation.html) for detailed options):
 
 ```bash
 conda create -n handwritten-ocr python=3.10
@@ -107,22 +107,66 @@ If your images live on Google Drive, rclone is a convenient way to mirror them l
    rclone copy output/ drive:path/to/outputs
    ```
 
-## Running on Windows (Conda/Anaconda prompt)
+## Running on Windows (detailed steps)
 
-The scripts work the same on Windows as long as they are executed from an Anaconda Prompt or PowerShell session where your Conda environment is active:
+You can operate entirely from Anaconda Prompt / PowerShell with Conda; the only requirement is having Git Bash (bundled with Git for Windows) or WSL for running the bash wrapper. Below are two common workflows.
 
-1. Open “Anaconda Prompt” (or a Conda-enabled PowerShell).
-2. `conda activate handwritten-ocr` (or the env you created).
-3. Use the scripts exactly as shown above, e.g.:
+### Option A: Use Git Bash (recommended)
+
+1. Install Git for Windows (<https://git-scm.com/download/win>) if you don’t already have it; this provides both `git` and a Bash shell.
+2. Open the **Anaconda Prompt**, then activate your environment:
+
+   ```cmd
+   conda activate handwritten-ocr
+   ```
+
+3. Launch **Git Bash** from the same prompt so it inherits the activated env:
+
+   ```cmd
+   bash
+   ```
+
+4. In Git Bash, run the wrapper exactly like on Linux:
 
    ```bash
-   bash scripts/run_annotation.sh --serve-dir data/raw --recursive
+   scripts/run_annotation.sh --serve-dir data/raw --recursive
    ```
 
-   If you installed Git for Windows, you already have `bash`; otherwise launch “Git Bash” or enable the Windows Subsystem for Linux (WSL) to run the shell scripts.
+   - Use `--terminals` if you want three Windows Terminal / Git Bash windows to stay up.
+   - Add `LABELSTUDIO_CMD="conda run -n handwritten-ocr label-studio start"` if the Label Studio binary isn’t on PATH.
 
-4. The Label Studio UI opens in your browser just like on Linux/macOS. If you prefer not to run bash, you can call the Python entrypoint directly:
+5. Label Studio opens in your browser, the file server serves `data/raw`, and the Python CLI generates predictions.
+
+### Option B: Pure PowerShell / Command Prompt
+
+If you can’t run Bash, call the Python components directly:
+
+1. Open **Anaconda Prompt** (or PowerShell) and activate your env:
 
    ```powershell
-   python scripts\run_paddle_annotation.py data\raw --recursive
+   conda activate handwritten-ocr
    ```
+
+2. Start Label Studio manually:
+
+   ```powershell
+   label-studio start
+   ```
+
+   Leave this window open (or start it in a new terminal).
+
+3. In another terminal, launch the local file server:
+
+   ```powershell
+   python serve_local_files.py --directory data\raw --port 8081
+   ```
+
+4. Finally, run the PaddleOCR CLI:
+
+   ```powershell
+   python scripts\run_paddle_annotation.py data\raw --recursive --output-json output\ls_preannotations.json
+   ```
+
+5. Import `output\ls_preannotations.json` into Label Studio when ready.
+
+You can combine these steps into a PowerShell script if you prefer automation on Windows without Bash. The key is ensuring each command runs inside the same Conda environment so PaddleOCR and Label Studio are available.*** End Patch
