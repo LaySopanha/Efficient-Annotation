@@ -82,7 +82,7 @@ Ensure the relevant `LABEL_STUDIO_MODE`, `LABEL_STUDIO_ROOT`, and `LABEL_STUDIO_
 To run the HTTP server yourself:
 
 ```bash
-python serve_local_files.py --directory data/raw --port 8081
+python serve_local_files.py --directory data/raw --port 8081 # if you want to change port you need to change code in the scrips section
 ```
 
 Then configure Label Studio to use `http://localhost:8081/…` for data sources.
