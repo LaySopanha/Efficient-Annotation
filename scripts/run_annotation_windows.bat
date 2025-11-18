@@ -34,9 +34,9 @@ echo [INFO] Launching Label Studio, local file server, and PaddleOCR annotator i
 echo [INFO] Images directory: %IMAGES_DIR%
 echo [INFO] Port: %SERVE_PORT%
 
-call :launch_window "Label Studio" "label-studio start"
-call :launch_window "Label Studio Files" "python serve_local_files.py --directory ""%IMAGES_DIR%"" --host 0.0.0.0 --port %SERVE_PORT%"
-call :launch_window "Paddle Annotation" "python scripts\run_paddle_annotation.py ""%IMAGES_DIR%"" %PY_ARGS%"
+call :launch_window "Label Studio" LS
+call :launch_window "Label Studio Files" SERVE
+call :launch_window "Paddle Annotation" PADDLE %PY_ARGS%
 
 echo [OK] Commands dispatched. Close each window manually when finished.
 
@@ -45,7 +45,10 @@ goto :eof
 
 :launch_window
 set "TITLE=%~1"
-set "CMD=%~2"
+set "ROLE=%~2"
+shift
+shift
+set "ROLE_ARGS=%*"
 set "TMP=%TEMP%\annot_%RANDOM%%RANDOM%.cmd"
 (
     echo @echo off
@@ -53,7 +56,19 @@ set "TMP=%TEMP%\annot_%RANDOM%%RANDOM%.cmd"
     echo set "LABEL_STUDIO_MODE=%LABEL_STUDIO_MODE%"
     echo set "LABEL_STUDIO_ROOT=%LABEL_STUDIO_ROOT%"
     echo set "LABEL_STUDIO_PREFIX=%LABEL_STUDIO_PREFIX%"
-    echo %CMD%
+    if /I "%ROLE%"=="LS" (
+        echo label-studio start
+    ) else if /I "%ROLE%"=="SERVE" (
+        echo python serve_local_files.py --directory "%%LABEL_STUDIO_ROOT%%" --host 0.0.0.0 --port %SERVE_PORT%
+    ) else if /I "%ROLE%"=="PADDLE" (
+        if defined ROLE_ARGS (
+            echo python scripts\run_paddle_annotation.py "%%LABEL_STUDIO_ROOT%%" %ROLE_ARGS%
+        ) else (
+            echo python scripts\run_paddle_annotation.py "%%LABEL_STUDIO_ROOT%%"
+        )
+    ) else (
+        echo echo Unknown role "%ROLE%"
+    )
 ) > "%TMP%"
 start "%TITLE%" cmd /k "%TMP%"
 goto :eof
